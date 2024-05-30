@@ -4,6 +4,7 @@ const Genre = require("../models/genre");
 const BookInstance = require("../models/bookinstance");
 
 const asyncHandler = require("express-async-handler");
+const {all} = require("express/lib/application");
 
 exports.index = asyncHandler(async (req, res, next) => {
     // Get details of books, book instances, authors and genre counts (in parallel)
@@ -33,7 +34,12 @@ exports.index = asyncHandler(async (req, res, next) => {
 
 // Display list of all books.
 exports.book_list = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Book list");
+    const allBooks = await Book.find({}, "title author")
+        .sort({ title: 1 })
+        .populate("author") // like join in mongobase
+        .exec();
+
+    res.render('book_list', { title: "Book List", book_list: allBooks });
 });
 
 // Display detail page for a specific book.
