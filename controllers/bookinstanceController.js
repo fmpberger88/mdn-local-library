@@ -9,7 +9,7 @@ exports.bookinstance_list = asyncHandler(async (req, res, next) => {
 
     res.render("bookinstance_list", {
         title: "Book Instance List",
-        bookinstances_list: allBookInstances
+        bookinstance_list: allBookInstances
     });
 });
 
