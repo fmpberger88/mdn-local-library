@@ -68,7 +68,7 @@ exports.genre_create_post = [
         } else {
             // Data from form is valid
             // Check if Genre with the same name already exists
-            const genreExists = Genre.findOne({ name: req.body.name })
+            const genreExists = await Genre.findOne({ name: req.body.name })
                 .collation({ locale: "en", strength: 2 })
                 .exec();
 
