@@ -118,7 +118,7 @@ exports.author_delete_post = asyncHandler(async (req, res, next) => {
         Book.find({ author: req.params.id }, "title summary").exec()
     ])
 
-    if (allBooksByAuthor > 0) {
+    if (allBooksByAuthor.length > 0) {
         // Author has books. Render in same way as for GET route
         res.render("author_delete", {
             title: "Delete Author",
