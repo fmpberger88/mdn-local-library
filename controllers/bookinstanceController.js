@@ -40,6 +40,7 @@ exports.bookinstance_create_get = asyncHandler(async (req, res, next) => {
     res.render("bookinstance_form", {
         title: "Create BookInstance",
         book_list: allBooks,
+        bookinstance: {}
     });
 });
 
@@ -129,7 +130,28 @@ exports.bookinstance_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display BookInstance update form on GET.
 exports.bookinstance_update_get = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: BookInstance update GET");
+    const [bookinstance, allBooks] = await Promise.all([
+        BookInstance.findById(req.params.id)
+            .populate({
+                path: 'book',
+                populate: { path: "author" },
+            }),
+        Book.find({}, 'title').sort({ title: 1 }).exec(),
+    ])
+
+    if (bookinstance === null || bookinstance === undefined) {
+        const err = new Error("Book copy not found");
+        err.status = 404;
+        return next(err);
+    }
+
+    // Set Booktitle of existing bookinstance
+
+    res.render('bookinstance_form', {
+        title: "Update BookInstance",
+        book_list: allBooks,
+        bookinstance: bookinstance,
+    })
 });
 
 // Handle bookinstance update on POST.
