@@ -98,8 +98,11 @@ exports.bookinstance_create_post = [
 
 // Display BookInstance delete form on GET.
 exports.bookinstance_delete_get = asyncHandler(async (req, res, next) => {
-    const bookInstance = await BookInstance.findByIdd(req.params.id)
-        .populate("book")
+    const bookInstance = await BookInstance.findById(req.params.id)
+        .populate({
+            path: "book",
+            populate: { path: "author"}
+        })
         .exec();
 
     if (bookInstance === null) {
