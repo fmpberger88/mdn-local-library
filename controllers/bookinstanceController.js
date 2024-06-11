@@ -155,13 +155,13 @@ exports.bookinstance_update_get = asyncHandler(async (req, res, next) => {
 });
 
 // Handle bookinstance update on POST.
-exports.bookinstance_update_post = asyncHandler(async (req, res, next) => [
+exports.bookinstance_update_post = [
     // Validate and sanitize fields
     body("book", "Book must be specified")
         .trim()
         .isLength({ min: 1})
         .escape(),
-    body("impprint", "Imprint must be specified")
+    body("imprint", "Imprint must be specified")
         .trim()
         .isLength({ min: 1 })
         .escape(),
