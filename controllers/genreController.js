@@ -2,6 +2,7 @@ const Genre = require("../models/genre");
 const asyncHandler = require("express-async-handler");
 const Book = require("../models/book");
 const { body, validationResult } = require("express-validator");
+const {all} = require("express/lib/application");
 
 // Display list of all Genre.
 exports.genre_list = asyncHandler(async (req, res, next) => {
@@ -18,7 +19,7 @@ exports.genre_list = asyncHandler(async (req, res, next) => {
 // Display detail page for a specific Genre.
 exports.genre_detail = asyncHandler(async (req, res, next) => {
     // Get details of genre by name and all associated books
-    const genre = await Genre.findOne({ name: req.params.id }).exec();
+    const genre = await Genre.findById(req.params.id).exec();
 
     // No results
     if (genre === null) {
@@ -87,12 +88,42 @@ exports.genre_create_post = [
 
 // Display Genre delete form on GET.
 exports.genre_delete_get = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Genre delete GET");
+    // Get details of Genre and all their books
+    const [genre, allBooksByGenre] = await Promise.all([
+        Genre.findById(req.params.id).exec(),
+        Book.find({ genre: req.params.id }, "title summary").exec()
+    ]);
+
+    if (genre === null) {
+        res.redirect('catalog/genres');
+    }
+
+    res.render('genre_delete', {
+        title: "Delete Genre",
+        genre: genre,
+        genre_books: allBooksByGenre
+    })
 });
 
 // Handle Genre delete on POST.
 exports.genre_delete_post = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Genre delete POST");
+    const [genre, allBooksByGenre] = await Promise.all([
+        Genre.findById(req.params.id).exec(),
+        Book.find({ genre: req.params.id }, 'title summary').exec()
+    ])
+
+    if (allBooksByGenre.length > 0) {
+        // Genre has Books
+        res.render('genre_delete', {
+            title: 'Genre delete',
+            genre: genre,
+            genre_books: allBooksByGenre,
+        });
+        return;
+    } else {
+        await Genre.findByIdAndDelete(req.body.genreid);
+        res.redirect('/catalog/genres');
+    }
 });
 
 // Display Genre update form on GET.
